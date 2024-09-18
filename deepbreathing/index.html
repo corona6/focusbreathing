@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000" />
+    <title>Deep Breathing</title>
+    <link rel="stylesheet" href="../checkbox.css">
+    <script>
+        window.addEventListener('load', () => {
+            const count = document.getElementById("count");
+            const pinput = document.getElementById("pi_input");
+            const circle = document.getElementById('circle');
+            const vibratebox = document.getElementById('vibrate');
+            const gaenbox = document.getElementById('guided-audio-en');
+            const gajabox = document.getElementById('guided-audio-ja');
+            var timer1 = null;
+            var timer2 = null;
+            var cnt = 0;
+            var cnta = 0;
+            var audioFileName = "";
+
+            pinput.addEventListener("input", (event) => {
+                animationRestart()
+            });
+
+            vibratebox.addEventListener("change", () => {
+                animationRestart()
+            });
+
+            gaenbox.addEventListener("change", () => {
+                animationRestart()
+            });
+
+            gajabox.addEventListener("change", () => {
+                animationRestart()
+            });
+
+            function animationRestart() {
+                clearInterval(timer1);
+                clearInterval(timer2);
+                cnt = 0;
+                cnta = 0;
+                if (vibratebox.checked) {
+                    timer1 = setInterval(vibrateEvent, 5000);
+                }
+                if (gaenbox.checked || gajabox.checked) {
+                    timer2 = setInterval(guidedAudio, 5000);
+                }
+                count.textContent = pinput.value + " (" + toTime(pinput.valueAsNumber * 10) + ")";
+                circle.style.animation = 'none';
+                circle.offsetHeight;
+                circle.style.animation = null;
+                circle.style.animationIterationCount = pinput.valueAsNumber + 0.5;
+            }
+
+            function vibrateEvent() {
+                cnt++;
+                if (cnt > pinput.valueAsNumber * 2 && timer1 != null) {
+                    clearInterval(timer1);
+                    cnt = 0;
+                    setTimeout(() => {
+                        navigator.vibrate(1001);
+                    }, 500);
+                }
+                navigator.vibrate(1001);
+                setTimeout(() => {
+                    navigator.vibrate(0);
+                }, 50);
+            }
+
+            function guidedAudio() {
+                cnta++;
+                var audio = new Audio();
+                audioFileName = gaenbox.checked ? "en" : "ja"
+                if (cnta > pinput.valueAsNumber * 2 && timer2 != null) {
+                    clearInterval(timer2);
+                    cnta = 0;
+                    audio.src = '../guided_audio/finish_' + audioFileName + '.mp3';
+                }
+                switch ((cnta - 1) % 2 + 1) {
+                    case 1:
+                        audio.src = '../guided_audio/inhale_' + audioFileName + '.mp3';
+                        break;
+                    case 2:
+                        audio.src = '../guided_audio/exhale_' + audioFileName + '.mp3';
+                        break;
+                    default:
+                }
+                audio.play();
+            }
+        })
+
+        function toTime(seconds) {
+            var date = new Date(null);
+            date.setSeconds(seconds);
+            return date.toISOString().substr(14, 5);
+        }
+
+        let wakeLock = null;
+
+        const requestWakeLock = async () => {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+            } catch (err) {
+            }
+        };
+
+        requestWakeLock();
+
+        window.setTimeout(() => {
+            wakeLock.release();
+            wakeLock = null;
+        }, 1000*60*16);
+
+        const handleVisibilityChange = async () => {
+            if (wakeLock !== null && document.visibilityState === 'visible') {
+                requestWakeLock();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+    </script>
+</head>
+<body>
+    <div id="visual">
+        <div id="breathing-container">
+            <div id="circle"></div>
+        </div>
+        <div id="count-container">
+            <input type="range" id="pi_input" name="pi_input" min="0" max="90" style="width: 70%;" />
+            <output id="count"></output>
+        </div>
+        <div id="checkbox-container">
+            <div class="ic-Super-toggle--on-off">
+                <input type="checkbox" id="vibrate" name="vibrate" class="ic-Super-toggle__input" />
+                <label class="ic-Super-toggle__label" for="vibrate">
+                    <div class="ic-Super-toggle__screenreader">Enable flux capacitor</div>
+                    <div class="ic-Super-toggle__disabled-msg" data-checked="On" data-unchecked="Off" aria-hidden="true"></div>
+                    <div class="ic-Super-toggle-switch" aria-hidden="true">
+                    <div class="ic-Super-toggle-option-LEFT" aria-hidden="true">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "></polygon></svg>
+                    </div>
+                    <div class="ic-Super-toggle-option-RIGHT" aria-hidden="true">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"></polygon></svg>
+                    </div>
+                    </div>
+                </label>
+            </div>
+            <label for="vibrate" style="margin-left: 10px;">vibrate</label>
+        </div>
+        <div id="checkbox-container">
+            <div class="ic-Super-toggle--on-off">
+                <input type="checkbox" id="guided-audio-en" name="guided-audio-en" class="ic-Super-toggle__input" />
+                <label class="ic-Super-toggle__label" for="guided-audio-en">
+                    <div class="ic-Super-toggle__screenreader">Enable flux capacitor</div>
+                    <div class="ic-Super-toggle__disabled-msg" data-checked="On" data-unchecked="Off" aria-hidden="true"></div>
+                    <div class="ic-Super-toggle-switch" aria-hidden="true">
+                    <div class="ic-Super-toggle-option-LEFT" aria-hidden="true">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "></polygon></svg>
+                    </div>
+                    <div class="ic-Super-toggle-option-RIGHT" aria-hidden="true">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"></polygon></svg>
+                    </div>
+                    </div>
+                </label>
+            </div>
+            <label for="guided-audio-en" style="margin-left: 10px;">guided audio (English)</label>
+        </div>
+        <div id="checkbox-container">
+            <div class="ic-Super-toggle--on-off">
+                <input type="checkbox" id="guided-audio-ja" name="guided-audio-ja" class="ic-Super-toggle__input" />
+                <label class="ic-Super-toggle__label" for="guided-audio-ja">
+                    <div class="ic-Super-toggle__screenreader">Enable flux capacitor</div>
+                    <div class="ic-Super-toggle__disabled-msg" data-checked="On" data-unchecked="Off" aria-hidden="true"></div>
+                    <div class="ic-Super-toggle-switch" aria-hidden="true">
+                    <div class="ic-Super-toggle-option-LEFT" aria-hidden="true">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" width="548.9" height="548.9" viewBox="0 0 548.9 548.9" xml:space="preserve"><polygon points="449.3 48 195.5 301.8 99.5 205.9 0 305.4 95.9 401.4 195.5 500.9 295 401.4 548.9 147.5 "></polygon></svg>
+                    </div>
+                    <div class="ic-Super-toggle-option-RIGHT" aria-hidden="true">
+                        <svg class="ic-Super-toggle__svg" xmlns="http://www.w3.org/2000/svg" version="1.1" x="0" y="0" viewBox="0 0 28 28" xml:space="preserve"><polygon points="28 22.4 19.6 14 28 5.6 22.4 0 14 8.4 5.6 0 0 5.6 8.4 14 0 22.4 5.6 28 14 19.6 22.4 28 " fill="#030104"></polygon></svg>
+                    </div>
+                    </div>
+                </label>
+            </div>
+            <label for="guided-audio-ja" style="margin-left: 10px;">guided audio (Japanese)</label>
+        </div>
+    </div>
+</body>
+<style>
+    :root {
+        --bg-color: #000;
+        font-size: calc(min(18px, 5vmin));
+    }
+
+    #circle {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background-color: #8ea6bb;
+        margin: 0 auto 20px;
+        animation: breathe 10s ease-in-out infinite;
+    }
+
+    @keyframes breathe {
+        0%, 100% {
+            transform: scale(3);
+        }
+        50% {
+            transform: scale(1);
+        }
+    }
+
+    body {
+        font-family: Arial,sans-serif;
+        background-color: var(--bg-color);
+        color: white;
+        margin: 0;
+    }
+
+    :root::-webkit-scrollbar { width: 0 }
+    :root { scrollbar-width: none; }
+    
+    #breathing-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+
+        border-bottom: 1px solid #444;
+    }
+
+    #count-container {
+        display: flex;
+        flex-flow: column;
+        justify-content: center;
+        align-items: center;
+        height: 20vh;
+    }
+
+    #checkbox-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 30vh;
+    }
+</style>
+</html>
