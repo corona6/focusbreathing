@@ -1,5 +1,5 @@
 
-const MAIN_CACHE = 'main_20240918_4';
+const MAIN_CACHE = 'main_20240930';
 
 self.addEventListener("install", async (event) => {
     event.waitUntil((async () => {
@@ -8,8 +8,11 @@ self.addEventListener("install", async (event) => {
             '.',
             './favicon.ico',
             './index.html',
+            './boxbreathing/',
             './boxbreathing/index.html',
+            './deepbreathing/',
             './deepbreathing/index.html',
+            './focusdot/',
             './focusdot/index.html',
             './manifest.webmanifest',
             './checkbox.css',
