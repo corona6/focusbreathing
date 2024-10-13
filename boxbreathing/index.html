@@ -65,8 +65,8 @@
                         boxel.style.opacity = 0.0;
                         el2.style.opacity = 0.0;
                     } else {
-                        boxel.style.opacity = 0.5;
-                        el2.style.opacity = 0.5;
+                        boxel.style.opacity = 0.4;
+                        el2.style.opacity = 0.4;
                     }
                     animationInterval = setInterval(animateFocusPoint, 1000);
                 } else {
@@ -300,6 +300,9 @@
     }
 
     #box-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         position: relative;
     }
     
@@ -397,8 +400,6 @@
     }
 
     #focus-point {
-        top: 50%;
-        left: 50%;
         width: 10px;
         height: 10px;
         background-color: var(--box-fill-color);
